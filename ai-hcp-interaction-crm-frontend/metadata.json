@@ -1,0 +1,6 @@
+{
+  "name": "AI HCP Interaction CRM",
+  "description": "An ultra-modern, premium enterprise AI-first CRM dashboard for the Healthcare (Life Sciences) industry.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

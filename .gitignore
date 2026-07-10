@@ -1,0 +1,76 @@
+# ===========================
+# Frontend (React/Vite)
+# ===========================
+ai-hcp-interaction-crm-frontend/node_modules/
+ai-hcp-interaction-crm-frontend/dist/
+ai-hcp-interaction-crm-frontend/.vite/
+ai-hcp-interaction-crm-frontend/.env
+ai-hcp-interaction-crm-frontend/.env.*
+
+# ===========================
+# Backend (FastAPI)
+# ===========================
+backend/.env
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.coverage
+backend/htmlcov/
+
+# ===========================
+# Python
+# ===========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# ===========================
+# Node
+# ===========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ===========================
+# Build
+# ===========================
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# ===========================
+# Database
+# ===========================
+*.db
+*.sqlite3
+*.sql
+
+# ===========================
+# IDE
+# ===========================
+.vscode/
+.idea/
+
+# ===========================
+# OS Files
+# ===========================
+.DS_Store
+Thumbs.db
+
+# ===========================
+# Logs
+# ===========================
+*.log
+
+# ===========================
+# Temporary
+# ===========================
+.cache/
+tmp/
+temp/
