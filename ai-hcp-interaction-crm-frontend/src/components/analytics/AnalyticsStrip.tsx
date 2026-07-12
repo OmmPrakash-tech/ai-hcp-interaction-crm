@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Users, BarChart3, Clock, UserCheck, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { getAnalytics } from "@/services/analyticsService";
 
 interface MetricData {
   label: string;
@@ -17,52 +18,71 @@ interface MetricData {
 export function AnalyticsStrip({ metricsUpdatedTrigger }: { metricsUpdatedTrigger?: number }) {
   const [animatedValues, setAnimatedValues] = useState<number[]>([0, 0, 0, 0]);
 
-  const initialMetrics: MetricData[] = [
-    {
-      label: "Today's Meetings",
-      value: 6,
-      change: "+2 today",
-      isPositive: true,
-      icon: Users,
-      sparkline: [4, 5, 4, 6, 8, 5, 7, 6],
-      colorClass: "text-brand-primary",
-      glowClass: "rgba(91, 140, 255, 0.2)",
-    },
-    {
-      label: "Positive Sentiment",
-      value: 84,
-      suffix: "%",
-      change: "+4.2% wk",
-      isPositive: true,
-      icon: BarChart3,
-      sparkline: [78, 80, 81, 79, 82, 85, 83, 84],
-      colorClass: "text-brand-success",
-      glowClass: "rgba(0, 230, 118, 0.2)",
-    },
-    {
-      label: "Pending Follow-ups",
-      value: 12,
-      change: "-3 since yesterday",
-      isPositive: true,
-      icon: Clock,
-      sparkline: [18, 16, 17, 14, 15, 12, 11, 12],
-      colorClass: "text-brand-warning",
-      glowClass: "rgba(255, 193, 7, 0.2)",
-    },
-    {
-      label: "Doctors Visited",
-      value: 148,
-      change: "+12 this mo",
-      isPositive: true,
-      icon: UserCheck,
-      sparkline: [120, 125, 128, 132, 135, 140, 145, 148],
-      colorClass: "text-brand-accent",
-      glowClass: "rgba(124, 77, 255, 0.2)",
-    },
-  ];
+  
+
+ const [initialMetrics, setInitialMetrics] = useState<MetricData[]>([]);
+
+ useEffect(() => {
+  async function loadAnalytics() {
+    try {
+      const data = await getAnalytics();
+
+      setInitialMetrics([
+        {
+          label: "Total Interactions",
+          value: data.total,
+          change: "Live",
+          isPositive: true,
+          icon: Users,
+          sparkline: [0, 1, 2, 3, data.total - 2, data.total - 1, data.total],
+          colorClass: "text-brand-primary",
+          glowClass: "rgba(91,140,255,0.2)",
+        },
+        {
+          label: "Positive",
+          value: data.positive,
+          change: "Live",
+          isPositive: true,
+          icon: BarChart3,
+          sparkline: [0, 1, data.positive],
+          colorClass: "text-brand-success",
+          glowClass: "rgba(0,230,118,0.2)",
+        },
+        {
+          label: "Negative",
+          value: data.negative,
+          change: "Live",
+          isPositive: false,
+          icon: Clock,
+          sparkline: [0, 1, data.negative],
+          colorClass: "text-brand-warning",
+          glowClass: "rgba(255,193,7,0.2)",
+        },
+        {
+          label: "Doctors",
+          value: data.doctors,
+          change: "Live",
+          isPositive: true,
+          icon: UserCheck,
+          sparkline: [0, 1, data.doctors],
+          colorClass: "text-brand-accent",
+          glowClass: "rgba(124,77,255,0.2)",
+        },
+      ]);
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  loadAnalytics();
+}, [metricsUpdatedTrigger]);
 
   useEffect(() => {
     // Count-up animation
+
+    if (initialMetrics.length === 0) return;
+
     const intervals = initialMetrics.map((m, idx) => {
       let current = 0;
       const target = m.value;

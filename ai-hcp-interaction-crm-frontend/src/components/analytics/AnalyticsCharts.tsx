@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { TrendingUp, Award, Layers, Users, Shield, CheckCircle, BarChart3, Star } from "lucide-react";
+import { getAnalytics } from "@/services/analyticsService";
 
 export function AnalyticsCharts() {
   const channelData = [

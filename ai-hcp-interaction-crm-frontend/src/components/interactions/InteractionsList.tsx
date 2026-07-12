@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Search, Calendar, Clock, User, Smile, ArrowUpRight, Filter, Eye, Copy, RefreshCw } from "lucide-react";
-import { HCPInteraction } from "@/types";
+// import { HCPInteraction } from "@/types";
+import { HCPInteraction } from "@/types/interaction";
 
 interface InteractionsListProps {
   interactions: HCPInteraction[];
   onLoadIntoForm: (interaction: HCPInteraction) => void;
+
+  onDelete: (id: number) => void;
 }
 
-export function InteractionsList({ interactions, onLoadIntoForm }: InteractionsListProps) {
+export function InteractionsList({ interactions, onLoadIntoForm, onDelete }: InteractionsListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sentimentFilter, setSentimentFilter] = useState<string>("All");
 
@@ -115,11 +118,11 @@ export function InteractionsList({ interactions, onLoadIntoForm }: InteractionsL
                       </span>
                       <span className="flex items-center gap-1">
                         <Calendar size={11} />
-                        {item.date}
+                        {item.interactionDate}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock size={11} />
-                        {item.time || "N/A"}
+                        {item.interactionTime || "N/A"}
                       </span>
                     </div>
                   </div>
@@ -169,7 +172,7 @@ export function InteractionsList({ interactions, onLoadIntoForm }: InteractionsL
                 </div>
 
                 {/* Load back into form for editing */}
-                <div className="absolute right-3 bottom-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute right-3 bottom-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <button
                     id={`load-interaction-${idx}`}
                     onClick={() => onLoadIntoForm(item)}
@@ -179,6 +182,18 @@ export function InteractionsList({ interactions, onLoadIntoForm }: InteractionsL
                     <RefreshCw size={11} />
                     Load to Edit
                   </button>
+                  <button
+    onClick={() => onDelete(item.id!)}
+    className="px-2.5 py-1.5 rounded-lg
+    bg-red-500/10
+    border
+    border-red-500/30
+    text-red-400
+    hover:bg-red-500/20
+    text-[10px]"
+>
+    Delete
+</button>
                 </div>
               </motion.div>
             ))

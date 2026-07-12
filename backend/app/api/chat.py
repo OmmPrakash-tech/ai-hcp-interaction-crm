@@ -19,12 +19,17 @@ router = APIRouter(
 async def chat(request: ChatRequest):
 
     result = graph.invoke(
-        {
-            "messages": [
-                HumanMessage(content=request.message)
-            ]
+    {
+        "messages": [
+            HumanMessage(content=request.message)
+        ]
+    },
+    config={
+        "configurable": {
+            "thread_id": "demo-user"
         }
-    )
+    }
+)
 
     messages = result["messages"]
 

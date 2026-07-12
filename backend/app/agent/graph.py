@@ -1,5 +1,5 @@
 from langgraph.graph import StateGraph, END
-
+from app.memory.checkpoint import memory
 from app.agent.state import AgentState
 from app.agent.assistant import assistant_node
 from app.agent.tool_node import tool_node
@@ -31,4 +31,6 @@ builder.add_edge(
     "assistant",
 )
 
-graph = builder.compile()
+graph = builder.compile(
+    checkpointer=memory
+)

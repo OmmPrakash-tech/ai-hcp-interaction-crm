@@ -1,14 +1,5 @@
-export interface HCPInteraction {
-  hcpName: string;
-  interactionType: string;
-  date: string;
-  time: string;
-  attendees: string[];
-  topicsDiscussed: string[];
-  sentiment: "Positive" | "Neutral" | "Negative" | "";
-  materialsShared: string[];
-  notes: string;
-}
+import { HCPInteraction } from "./types/interaction";
+
 
 export interface Message {
   id: string;

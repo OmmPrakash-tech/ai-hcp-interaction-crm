@@ -4,7 +4,7 @@ import {
   User, Calendar, Clock, Users, BookOpen, 
   Smile, Share2, Clipboard, Lock, Unlock, CheckCircle, HelpCircle, FileText, ArrowRight
 } from "lucide-react";
-import { HCPInteraction } from "@/types";
+import { HCPInteraction } from "@/types/interaction";
 
 interface HCPFormProps {
   formData: HCPInteraction;
@@ -26,10 +26,11 @@ export function HCPForm({
 
   // Field help text
   const fieldDescriptions: Record<keyof HCPInteraction, string> = {
+    id: "Unique identifier for the interaction log.",
     hcpName: "Full name of the medical practitioner.",
     interactionType: "The format or channel of communication.",
-    date: "The calendar date of the interaction.",
-    time: "The clock time of the meeting.",
+    interactionDate: "The calendar date of the interaction.",
+    interactionTime: "The clock time of the meeting.",
     attendees: "Other professionals or representatives present.",
     topicsDiscussed: "Medical/product topics, studies, trials discussed.",
     sentiment: "Subjective response of the HCP.",
@@ -168,7 +169,7 @@ export function HCPForm({
             Date
           </label>
           <div className="relative">
-            {loadingFields.date ? (
+            {loadingFields.interactionDate ? (
               <div className="w-full h-11 rounded-xl bg-white/5 animate-pulse border border-white/10 flex items-center px-4">
                 <div className="h-4 bg-white/10 rounded w-1/2" />
               </div>
@@ -177,10 +178,10 @@ export function HCPForm({
                 id="input-date"
                 type="date"
                 disabled={!isManualEdit}
-                value={formData.date}
-                onChange={(e) => onChange({ date: e.target.value })}
+                value={formData.interactionDate}
+                onChange={(e) => onChange({ interactionDate: e.target.value })}
                 className={`w-full px-4 py-2.5 rounded-xl text-sm text-white glass-input ${
-                  resolvedFields.date ? "border-brand-primary shadow-[0_0_15px_rgba(91,140,255,0.2)]" : ""
+                  resolvedFields.interactionDate ? "border-brand-primary shadow-[0_0_15px_rgba(91,140,255,0.2)]" : ""
                 } ${!isManualEdit ? "cursor-not-allowed opacity-60" : ""}`}
               />
             )}
@@ -194,7 +195,7 @@ export function HCPForm({
             Time
           </label>
           <div className="relative">
-            {loadingFields.time ? (
+            {loadingFields.interactionTime ? (
               <div className="w-full h-11 rounded-xl bg-white/5 animate-pulse border border-white/10 flex items-center px-4">
                 <div className="h-4 bg-white/10 rounded w-1/3" />
               </div>
@@ -203,10 +204,10 @@ export function HCPForm({
                 id="input-time"
                 type="time"
                 disabled={!isManualEdit}
-                value={formData.time}
-                onChange={(e) => onChange({ time: e.target.value })}
+                value={formData.interactionTime}
+                onChange={(e) => onChange({ interactionTime: e.target.value })}
                 className={`w-full px-4 py-2.5 rounded-xl text-sm text-white glass-input ${
-                  resolvedFields.time ? "border-brand-accent shadow-[0_0_15px_rgba(124,77,255,0.2)]" : ""
+                  resolvedFields.interactionTime ? "border-brand-accent shadow-[0_0_15px_rgba(124,77,255,0.2)]" : ""
                 } ${!isManualEdit ? "cursor-not-allowed opacity-60" : ""}`}
               />
             )}

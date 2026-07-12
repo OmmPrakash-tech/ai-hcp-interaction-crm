@@ -3,32 +3,58 @@ import { motion, AnimatePresence } from "motion/react";
 import { BackgroundEffect } from "./components/layout/BackgroundEffect";
 import { TopNavbar } from "./components/layout/TopNavbar";
 import { AnalyticsStrip } from "./components/analytics/AnalyticsStrip";
-
+import { sendMessage } from "./services/chatService";
 import { AIAssistant } from "./components/ai/AIAssistant";
+import {
+  createInteraction,
+  updateInteraction,
+} from "./services/interactionService";
 
+
+import { deleteInteraction } from "./services/interactionService";
+import { mapInteraction } from "@/utils/interactionMapper";
+import { getInteractions } from "./services/interactionService";
 import { AnalyticsCharts } from "./components/analytics/AnalyticsCharts";
 import { SettingsPanel } from "./components/settings/SettingsPanel";
-import { HCPInteraction, Message } from "./types";
-import { initialPastInteractions } from "./data";
+import { Message } from "./types";
+// import { HCPInteraction } from "./types/interaction";
+import { HCPInteraction } from "@/types/interaction";
+
 import { HelpCircle, Sparkles, X, CheckCircle2 } from "lucide-react";
 import { HCPForm } from "./components/form/HCPForm";
 import { InteractionsList } from "./components/interactions/InteractionsList";
 import { DoctorsDatabase } from "./components/doctors/DoctorsDatabase";
-
+ 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>("dashboard");
-  const [interactions, setInteractions] = useState<HCPInteraction[]>(initialPastInteractions);
+  const [interactions, setInteractions] =
+  useState<HCPInteraction[]>([]);
+
+  useEffect(() => {
+  async function loadInteractions() {
+    try {
+      const data = await getInteractions();
+
+      setInteractions(data.map(mapInteraction));
+    } catch (error) {
+      console.error("Failed to load interactions:", error);
+    }
+  }
+
+  loadInteractions();
+}, []);
+
   const [metricsTrigger, setMetricsTrigger] = useState<number>(0);
 
   // Form states
   const [formData, setFormData] = useState<HCPInteraction>({
     hcpName: "",
     interactionType: "",
-    date: "",
-    time: "",
+    interactionDate: "",
+    interactionTime: "",
     attendees: [],
     topicsDiscussed: [],
-    sentiment: "",
+    sentiment: "Neutral",
     materialsShared: [],
     notes: "",
   });
@@ -53,6 +79,26 @@ export default function App() {
     text: "",
   });
 
+
+  const handleDeleteInteraction = async (id: number) => {
+
+    try {
+
+        await deleteInteraction(id);
+
+        setInteractions(prev =>
+            prev.filter(i => i.id !== id)
+        );
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
+
+};
+
+
   // Action: Clear history
   const handleClearHistory = () => {
     setMessages([
@@ -66,11 +112,11 @@ export default function App() {
     setFormData({
       hcpName: "",
       interactionType: "",
-      date: "",
-      time: "",
+      interactionDate: "",
+      interactionTime: "",
       attendees: [],
       topicsDiscussed: [],
-      sentiment: "",
+      sentiment: "Neutral",
       materialsShared: [],
       notes: "",
     });
@@ -83,11 +129,11 @@ export default function App() {
     setFormData({
       hcpName: docName,
       interactionType: "",
-      date: "2026-07-10",
-      time: "08:23",
+      interactionDate: "2026-07-10",
+      interactionTime: "08:23",
       attendees: [docName],
       topicsDiscussed: [],
-      sentiment: "",
+      sentiment: "Neutral",
       materialsShared: [],
       notes: "",
     });
@@ -127,29 +173,72 @@ export default function App() {
   };
 
   // Action: Save Form Data to historic ledger
-  const handleSaveInteraction = () => {
-    setInteractions((prev) => [formData, ...prev]);
-    setMetricsTrigger((prev) => prev + 1);
-    
-    // Clear form
+  const handleSaveInteraction = async () => {
+  try {
+
+    if (formData.id) {
+
+      // UPDATE
+      const updated = await updateInteraction(
+        formData.id,
+        formData
+      );
+
+      setInteractions(prev =>
+        prev.map(item =>
+          item.id === updated.id
+            ? mapInteraction(updated)
+            : item
+        )
+      );
+
+      setNotificationModal({
+        isOpen: true,
+        text: "Interaction updated successfully.",
+      });
+
+    } else {
+
+      // CREATE
+      const saved = await createInteraction(formData);
+
+      setInteractions(prev => [
+        mapInteraction(saved),
+        ...prev
+      ]);
+
+      setNotificationModal({
+        isOpen: true,
+        text: "Interaction saved successfully.",
+      });
+
+    }
+
+    setMetricsTrigger(prev => prev + 1);
+
     setFormData({
       hcpName: "",
       interactionType: "",
-      date: "",
-      time: "",
+      interactionDate: "",
+      interactionTime: "",
       attendees: [],
       topicsDiscussed: [],
-      sentiment: "",
+      sentiment: "Neutral",
       materialsShared: [],
       notes: "",
     });
-    
-    // Show premium visual modal
+
+  } catch (err) {
+
+    console.error(err);
+
     setNotificationModal({
       isOpen: true,
-      text: "Interaction ledger successfully synchronized with secure HIPAA cloud database. Analytics charts and metrics updated.",
+      text: "Failed to save interaction.",
     });
-  };
+
+  }
+};
 
   // Action: Resolve Extracted AI Fields Sequentially
   const resolveFieldsSequentially = async (fields: Partial<HCPInteraction>) => {
@@ -218,36 +307,36 @@ export default function App() {
     setIsThinking(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
-          history: messages.map((m) => ({ role: m.role, content: m.content })),
-        }),
-      });
+      const data = await sendMessage(text);
 
-      if (!response.ok) {
-        throw new Error("Failed to contact server AI endpoint");
-      }
-
-      const data = await response.json();
+      console.log("FULL RESPONSE:", data);
+console.log("FORM DATA:", data.form_data);
       
       const assistantMsg: Message = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
-        content: data.reply || "I have analyzed your interaction data successfully.",
+        content: data.response,
         timestamp: "08:23 AM",
-        extractedFields: data.extractedFields,
+        extractedFields: undefined,
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
       setIsThinking(false);
 
       // Trigger sequential highlight field loading if extractedFields are returned
-      if (data.extractedFields) {
-        resolveFieldsSequentially(data.extractedFields);
-      }
+      if (data.form_data) {
+    resolveFieldsSequentially({
+        hcpName: data.form_data.hcp_name,
+        interactionType: data.form_data.interaction_type,
+        interactionDate: data.form_data.interaction_date,
+        interactionTime: data.form_data.interaction_time,
+        attendees: data.form_data.attendees,
+        topicsDiscussed: data.form_data.topics_discussed,
+        sentiment: data.form_data.sentiment,
+        materialsShared: data.form_data.materials_shared,
+        notes: data.form_data.notes,
+    });
+}
 
     } catch (error: any) {
       console.error(error);
@@ -256,6 +345,7 @@ export default function App() {
         {
           id: `error-${Date.now()}`,
           role: "assistant",
+          
           content: "I encountered a communication error connecting to the Gemini server module. I will fallback to a simulated model to help parse your entry.",
           timestamp: "08:23 AM",
         },
@@ -267,8 +357,8 @@ export default function App() {
         const mockResponse = {
           hcpName: "Dr. Sarah Jenkins",
           interactionType: "Virtual Call",
-          date: "2026-07-10",
-          time: "14:30",
+          interactionDate: "2026-07-10",
+          interactionTime: "14:30",
           attendees: ["Dr. Sarah Jenkins", "John Doe"],
           topicsDiscussed: ["Cardioxa Phase 3 Clinical trials", "Safety efficacy profile"],
           sentiment: "Positive" as const,
@@ -350,6 +440,7 @@ export default function App() {
                 <InteractionsList 
                   interactions={interactions} 
                   onLoadIntoForm={handleLoadIntoForm}
+                  onDelete={handleDeleteInteraction}
                 />
               </motion.div>
             )}
