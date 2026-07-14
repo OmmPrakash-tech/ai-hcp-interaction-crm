@@ -53,35 +53,39 @@ export function AIAssistant({
     onSendMessage(text);
   };
 
-  const startVoiceInputSim = () => {
-    setIsRecording(true);
+ const startVoiceInput = () => {
+  const SpeechRecognition =
+    (window as any).SpeechRecognition ||
+    (window as any).webkitSpeechRecognition;
 
-    const chosen =
-      voiceScripts[
-        Math.floor(Math.random() * voiceScripts.length)
-      ];
+  if (!SpeechRecognition) {
+    alert("Speech Recognition is not supported in this browser.");
+    return;
+  }
 
-    let currentText = "";
+  const recognition = new SpeechRecognition();
 
-    let wordIndex = 0;
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.continuous = false;
 
-    const words = chosen.split(" ");
+  setIsRecording(true);
 
-    const interval = setInterval(() => {
-      if (wordIndex < words.length) {
-        currentText +=
-          (wordIndex === 0 ? "" : " ") + words[wordIndex];
+  recognition.start();
 
-        setInputValue(currentText);
-
-        wordIndex++;
-      } else {
-        clearInterval(interval);
-
-        setIsRecording(false);
-      }
-    }, 150);
+  recognition.onresult = (event: any) => {
+    const transcript = event.results[0][0].transcript;
+    setInputValue(transcript);
   };
+
+  recognition.onerror = () => {
+    setIsRecording(false);
+  };
+
+  recognition.onend = () => {
+    setIsRecording(false);
+  };
+};
 
   return (
     <div
@@ -133,7 +137,7 @@ export function AIAssistant({
         value={inputValue}
         onChange={setInputValue}
         onSubmit={handleSubmit}
-        onVoiceInput={startVoiceInputSim}
+        onVoiceInput={startVoiceInput}
         isThinking={isThinking}
         isRecording={isRecording}
       />

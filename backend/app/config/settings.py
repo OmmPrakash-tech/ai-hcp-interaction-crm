@@ -10,9 +10,9 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str
 
-    GEMINI_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
 
-    MODEL_NAME: str = "gemma2-9b-it"
+    MODEL_NAME: str = "llama-3.3-70b-versatile"
 
     SECRET_KEY: str
 

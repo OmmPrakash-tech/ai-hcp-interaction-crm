@@ -1,9 +1,10 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
+# from langchain_google_genai import ChatGoogleGenerativeAI
 from app.config.settings import settings
+from langchain_groq import ChatGroq
 
 def get_llm():
-    return ChatGoogleGenerativeAI(
+    return ChatGroq(
         model=settings.MODEL_NAME,
-        google_api_key=settings.GEMINI_API_KEY,
+        api_key=settings.GROQ_API_KEY,
         temperature=0,
     )
