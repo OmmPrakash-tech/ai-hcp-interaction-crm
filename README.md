@@ -1,6 +1,6 @@
 # 🏥 AI HCP Interaction CRM
 
-An AI-powered CRM application for logging, managing, and analyzing Healthcare Professional (HCP) interactions using **React**, **FastAPI**, **PostgreSQL**, **LangGraph**, and **Google Gemini**.
+An AI-powered CRM application for logging, managing, and analyzing Healthcare Professional (HCP) interactions using **React**, **FastAPI**, **PostgreSQL**, **LangGraph**, and **Groq API**.
 
 The application allows pharmaceutical representatives to interact with an AI assistant using natural language. The AI extracts structured interaction details, stores them in the CRM, and provides intelligent querying over historical interactions.
 
@@ -72,7 +72,7 @@ The AI agent can:
 - PostgreSQL
 - LangGraph
 - LangChain
-- Google Gemini API
+- Groq API
 
 ---
 
@@ -86,7 +86,7 @@ PostgreSQL
 
 - LangGraph
 - LangChain
-- Gemini 2.x Flash
+- llama-3.3-70b-versatile
 
 ---
 
@@ -177,9 +177,9 @@ backend/.env
 ```env
 DATABASE_URL=postgresql://postgres:password@localhost:5432/hcpcrm
 
-GEMINI_API_KEY=YOUR_API_KEY
+GROQ_API_KEY=YOUR_API_KEY
 
-MODEL_NAME=gemini-3.x-flash
+MODEL_NAME=llama-3.3-70b-versatile
 ```
 
 ---
@@ -294,7 +294,7 @@ FastAPI
 LangGraph Agent
       │
       ▼
-Gemini LLM
+Groq LLM
       │
       ▼
 Tool Calling
